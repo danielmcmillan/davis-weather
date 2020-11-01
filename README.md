@@ -19,6 +19,10 @@ TODO: queues, LOOP/LOOP2 read frequency + SQS publish frequency, SQS message for
 
 Javascript library for working with data collected from the Davis weather station.
 
+- extracting raw packet data from a message as published by davis-esp
+- CRC validation
+- parsing fields from a packet into a JSON object
+
 ## sqs-backup
 
 AWS Service for backing up Davis weather station data to an S3 bucket.
