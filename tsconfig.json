@@ -10,6 +10,7 @@
       "es2020.string",
       "es2020.symbol.wellknown"
     ],
+    "strict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,

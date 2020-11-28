@@ -3,7 +3,6 @@ import { BarTrend, LoopPacketType } from "./common";
 import {
   binStormDateToTimestamp,
   farenheitToCelsius,
-  hundredthsOfHourPlusMinutesToMinutes,
   hundredthsOfInchToMm,
   milesToKilometres,
   noop,
@@ -48,7 +47,7 @@ export const loop2Definition: PacketDefinition<Loop2Parsed> = {
       id: "barTrend",
       offset: 3,
       intFormat: IntFieldFormat.Int8,
-      intTransform: (value): BarTrend =>
+      intTransform: (value): BarTrend | null =>
         Object.values(BarTrend).includes(value) ? value : null,
     },
     {

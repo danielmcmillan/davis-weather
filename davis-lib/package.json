@@ -1,6 +1,6 @@
 {
   "name": "@danielmcmillan/davis-weather-lib",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Library for handling data from a Davis weather station.",
   "scripts": {
     "build": "tsc",

@@ -32,7 +32,7 @@ export function parsePacket<T extends {}>(
   const result: T = ({} as unknown) as T;
   for (const fieldDefinition of packetDefinition.fields) {
     if (fieldDefinition.isUnavailable && fieldDefinition.isUnavailable(data)) {
-      result[fieldDefinition.id] = null;
+      result[fieldDefinition.id] = (null as unknown) as T[keyof T];
     } else if ("intFormat" in fieldDefinition) {
       const rawValue = data[readIntBufferFunctions[fieldDefinition.intFormat]](
         fieldDefinition.offset
