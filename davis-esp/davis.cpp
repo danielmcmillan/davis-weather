@@ -61,7 +61,8 @@ size_t davis_read(uint8_t *buffer, size_t length)
 bool davis_consume_to(const uint8_t *sequence, size_t length)
 {
   size_t sequence_index = 0;
-  while (true)
+  PolledTimeout timeout(DAVIS_READ_TIMEOUT * length);
+  while (timeout.running())
   {
     int data = DAVIS_SERIAL.read();
     if (data < 0)
@@ -89,6 +90,7 @@ bool davis_consume_to(const uint8_t *sequence, size_t length)
     Serial.print(data, DEC);
     Serial.println("\".");
   }
+  return false; // Timed out waiting for expected sequence
 }
 
 bool davis_wake()
@@ -122,14 +124,20 @@ bool davis_wake()
   return false;
 }
 
-void davis_loop_packet(uint8_t *loop_packet)
+bool davis_loop_packet(uint8_t *loop_packet)
 {
-  // TODO type
+  // TODO loop type
   const uint8_t ack_sequence[1] = {ACK};
   DAVIS_SERIAL.write("LPS 2 1\n");
-  davis_wait_for_data();
-  davis_consume_to(ack_sequence, 1);
-  size_t read = davis_read(loop_packet, 99);
+  if (davis_wait_for_data() && davis_consume_to(ack_sequence, 1))
+  {
+    size_t read = davis_read(loop_packet, 99);
+    return read == 99; // TODO Test this with real device.
+  }
+  else
+  {
+    return false;
+  }
 }
 
 // TEMP for testing
@@ -150,12 +158,18 @@ void davis_hex_encode_array(uint8_t *data, size_t length, char *result)
   result[length * 2] = 0;
 }
 
-void davis_go(char *hex)
+boolean davis_go(char *hex)
 {
   uint8_t loop_packet[99] = {0};
-  davis_wake();
-  davis_loop_packet(loop_packet);
-  davis_hex_encode_array(loop_packet, 99, hex);
+  if (davis_wake() && davis_loop_packet(loop_packet))
+  {
+    davis_hex_encode_array(loop_packet, 99, hex);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 // void flash_lamps(bool woken)
