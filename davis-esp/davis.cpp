@@ -132,10 +132,12 @@ bool davis_loop_packet(uint8_t *loop_packet)
   if (davis_wait_for_data() && davis_consume_to(ack_sequence, 1))
   {
     size_t read = davis_read(loop_packet, 99);
+    Serial.printf("[DAVIS] Read %d bytes of LOOP data.\n", read);
     return read == 99; // TODO Test this with real device.
   }
   else
   {
+    Serial.println("[DAVIS] Timed out waiting for acknowledgement for LOOP packet command.");
     return false;
   }
 }
