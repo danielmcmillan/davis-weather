@@ -116,7 +116,9 @@ namespace aws_request
     Serial.println("[AWS] Starting connection to server...");
     if (!client.connect(this->parameters.host, 443))
     {
-      Serial.println("[AWS] Connection failed!");
+      char error_buf[100];
+      int error = client.lastError(error_buf, 100);
+      Serial.printf("[AWS] Connection failed with error %d: %s\n", error, error_buf);
       return response;
     }
     Serial.println("[AWS] Connected to server, writing request...");

@@ -19,7 +19,11 @@ bool startWiFi(const char *ssid, const char *password)
     yield();
     if (WiFi.status() == WL_CONNECTED)
     {
-      Serial.printf("[WiFi] Connected to \"%s\".\n", WiFi.SSID().c_str());
+      Serial.printf("[WiFi] Connected to \"%s\". Local IP is %s. DNS IP is %s.\n", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str(), WiFi.dnsIP().toString().c_str());
+
+      WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(1, 1, 1, 1)); 
+      delay(10);
+      Serial.printf("[WiFi] Changed DNS IP to %s.\n", WiFi.dnsIP().toString().c_str());
       return true;
     }
     else if (WiFi.status() == WL_CONNECT_FAILED)
