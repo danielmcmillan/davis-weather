@@ -3,7 +3,6 @@
 
 #include "esp_wifi.h"
 #include <pgmspace.h>
-#include <NTPClient.h>
 #include <WiFiUdp.h>
 
 namespace aws_request
@@ -28,8 +27,6 @@ namespace aws_request
   class AWSRequest
   {
     WiFiClientSecure client;
-    WiFiUDP ntpUDP;
-    NTPClient timeClient;
 
 #ifdef ESP8266
     BearSSL::X509List x509;
@@ -44,7 +41,7 @@ namespace aws_request
     /// 65 bytes will be written at `result` including a NULL terminator byte.
     void sign(char *date_time, char *result);
     /// Send the request using WiFiClientSecure.
-    AWSResponse send();
+    AWSResponse send(time_t timestamp);
   };
 } // namespace aws_request
 

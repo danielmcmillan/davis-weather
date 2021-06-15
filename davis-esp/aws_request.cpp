@@ -30,7 +30,7 @@ namespace aws_request
 
 #ifdef ESP8266
   AWSRequest::AWSRequest(AWSRequestParameters parameters, bool validate_cert)
-      : parameters(parameters), client(), ntpUDP(), timeClient(ntpUDP, "pool.ntp.org", 0, 7200000), x509(CERT_CA)
+      : parameters(parameters), client(), x509(CERT_CA)
   {
     if (validate_cert)
     {
@@ -40,11 +40,10 @@ namespace aws_request
     {
       this->client.setInsecure();
     }
-    this->timeClient.begin();
   }
 #else
   AWSRequest::AWSRequest(AWSRequestParameters parameters, bool validate_cert)
-      : parameters(parameters), client(), ntpUDP(), timeClient(ntpUDP, "pool.ntp.org", 0, 7200000)
+      : parameters(parameters), client()
   {
     if (validate_cert)
     {
@@ -95,14 +94,11 @@ namespace aws_request
     free(buffer);
   }
 
-  AWSResponse AWSRequest::send()
+  AWSResponse AWSRequest::send(time_t timestamp)
   {
     AWSResponse response = AWSResponse({.status = -1});
-    this->timeClient.begin();
     // Get the time
     char date_time[DATE_TIME_LEN + 1] = {0};
-    this->timeClient.update();
-    time_t timestamp = this->timeClient.getEpochTime();
     struct tm *time_struct = gmtime((long *)&timestamp);
     strftime(date_time, DATE_TIME_LEN + 1, "%Y%m%dT%H%M%SZ", time_struct);
 
