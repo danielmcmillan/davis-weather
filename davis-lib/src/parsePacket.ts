@@ -23,6 +23,7 @@ const readIntBufferFunctions: Record<
  *
  * @param data The packet data as a Buffer.
  * @param packetDefinition Definition of the fields available in the data packet.
+ * Precondition: format of the `data` buffer matches the `packetDefinition`
  * @returns An object containing the field values parsed from the data packet.
  */
 export function parsePacket<T extends {}>(

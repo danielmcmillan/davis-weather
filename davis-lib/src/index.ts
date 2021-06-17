@@ -1,6 +1,6 @@
 export * from "./types/Packet";
 export * from "./types/PacketDefinition";
-export * from "./extractPacket";
+export * from "./extractPackets";
 export * from "./validateCRC";
 export * from "./parsePacket";
 export * from "./loopPackets/loop1";

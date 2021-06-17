@@ -1,7 +1,8 @@
 {
   "name": "@danielmcmillan/davis-weather-lib",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Library for handling data from a Davis weather station.",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest"
@@ -16,14 +17,14 @@
     "url": "git@github.com:danielmcmillan/davis-weather.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
-    "@babel/preset-typescript": "^7.12.1",
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7",
     "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.6",
-    "babel-jest": "^26.6.1",
-    "jest": "^26.6.1",
-    "typescript": "^4.0.5"
+    "@types/node": "^14.14.10",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "typescript": "^4.3.3"
   },
   "dependencies": {}
 }

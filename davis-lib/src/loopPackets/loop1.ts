@@ -88,7 +88,7 @@ export const loop1Definition: PacketDefinition<Loop1Parsed> = {
       id: "barTrend",
       offset: 3,
       intFormat: IntFieldFormat.Int8,
-      intTransform: (value): BarTrend =>
+      intTransform: (value): BarTrend | null =>
         Object.values(BarTrend).includes(value) ? value : null,
     },
     {
