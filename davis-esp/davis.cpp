@@ -133,7 +133,7 @@ bool davis_loop_packet(uint8_t *loop_packet)
   {
     size_t read = davis_read(loop_packet, 99);
     Serial.printf("[DAVIS] Read %d bytes of LOOP data.\n", read);
-    return read == 99; // TODO Test this with real device.
+    return read == 99;
   }
   else
   {

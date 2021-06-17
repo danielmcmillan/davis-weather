@@ -5,7 +5,14 @@
 Software for ESP8266 or ESP32 for collecting data from Davis Vantage Pro2 weather station and
 publishing to an AWS SNS topic.
 
-TODO: queues, LOOP/LOOP2 read frequency + SQS publish frequency, SQS message format
+TODO:
+
+- include power state, battery voltage in messages
+- on failure to read data send message indicating this
+- handle missing network by queueing data to be stored. Timestamp may be unknown, indicate this somehow and use `millis()` to provide some relative time information.
+- use sd-card as non-volatile storage for queue
+- create template for aws resources
+- collect additional data, other than LOOP2 packet
 
 ### Wiring
 
@@ -15,6 +22,8 @@ TODO: queues, LOOP/LOOP2 read frequency + SQS publish frequency, SQS message for
 - RXD0 pin 5 to ESP TX
 - TXD0 pin 6 to ESP RX
 
+The second serial port is used, since first one is used for debugging.
+
 ## davis-lib
 
 Javascript library for working with data collected from the Davis weather station.
@@ -22,14 +31,3 @@ Javascript library for working with data collected from the Davis weather statio
 - extracting raw packet data from a message as published by davis-esp
 - CRC validation
 - parsing fields from a packet into a JSON object
-
-## sqs-backup
-
-AWS Service for backing up Davis weather station data to an S3 bucket.
-
-Schedule period: 1 day
-
-S3 object format:
-
-- key: "{{epoch time}}"
-- content: contiguous, each packet prefixed with 4 bytes for epoch timestamp + 2 bytes packet type
