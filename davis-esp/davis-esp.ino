@@ -4,7 +4,7 @@
 #include <NTPClient.h>
 #include "wifi_mqtt_client.h"
 
-char body[300] = {0};
+char body[350] = {0};
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 7200000);
 WifiMqttClient client(AWS_CERT_CA, AWS_IOT_CERT, AWS_IOT_PRIVATE_KEY);
@@ -21,6 +21,12 @@ void setup()
 
 void loop()
 {
+  // Get voltages
+  // USB voltage: GPIO34
+  // Battery voltage: GPIO36
+  uint16_t usbVoltage = analogRead(34);
+  uint16_t batteryVoltage = analogRead(36);
+
   if (startWiFi(WIFI_SSID, WIFI_PASSWORD) && client.connect(AWS_IOT_ENDPOINT, 8883, AWS_IOT_THING_NAME))
   {
     timeClient.begin();
@@ -30,6 +36,7 @@ void loop()
     size_t prefix_len = strlen(body);
     if (davis_go(body + prefix_len))
     {
+      sprintf(body + prefix_len + 198, "%04x%04x", usbVoltage, batteryVoltage);
       Serial.printf("[General] Sending message %s at timestamp %d.\n", body, timestamp);
       client.publish(AWS_IOT_TOPIC, body);
     }
