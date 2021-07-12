@@ -1,4 +1,4 @@
-import { loop2Definition } from "./loopPackets/loop2";
+import { loop2Definition } from "./dataPackets/loop2";
 import { mockLoop2 } from "./mock/loop2";
 import { parsePacket } from "./parsePacket";
 
