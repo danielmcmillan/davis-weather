@@ -45,5 +45,13 @@ bool WifiMqttClient::disconnect()
 
 bool WifiMqttClient::publish(const char *topic, const char *body)
 {
-    return this->mqttClient.publish(topic, body);
+    if (this->mqttClient.publish(topic, body))
+    {
+        return true;
+    }
+    else
+    {
+        Serial.println("[MQTT] Failed to publish.");
+        return false;
+    }
 }

@@ -32,18 +32,23 @@ void loop()
     timeClient.begin();
     timeClient.update();
     time_t timestamp = timeClient.getEpochTime();
-    sprintf(body, "01%08x0000", timestamp);
+    sprintf(body, "00%08x0000", timestamp);
     size_t prefix_len = strlen(body);
+    size_t davis_len = 0;
     if (davis_go(body + prefix_len))
     {
-      sprintf(body + prefix_len + 198, "%04x%04x", usbVoltage, batteryVoltage);
-      Serial.printf("[General] Sending message %s at timestamp %d.\n", body, timestamp);
-      client.publish(AWS_IOT_TOPIC, body);
+      davis_len = 198;
+      // Update first byte to indicate success
+      body[1] = '1';
     }
+    sprintf(body + prefix_len + davis_len, "%04x%04x", usbVoltage, batteryVoltage);
+    Serial.printf("[General] Sending message %s at timestamp %d.\n", body, timestamp);
+    client.publish(AWS_IOT_TOPIC, body);
 
+    delay(500);
     client.disconnect();
     stopWiFi();
   }
-  Serial.printf("[General] Waiting for 2 minutes...\n");
-  delay(120000);
+  Serial.printf("[General] Waiting...\n");
+  delay(88000);
 }
