@@ -1,0 +1,35 @@
+{
+  "name": "@danielmcmillan/davis-backup",
+  "version": "0.1.1",
+  "description": "Service for backing up data from SQS to S3.",
+  "main": "dist/index.js",
+  "bin": {
+    "davis-backup": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "author": "Daniel McMillan",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:danielmcmillan/davis-weather.git"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.10",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "typescript": "^4.3.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.948.0"
+  }
+}
