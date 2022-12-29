@@ -2,13 +2,10 @@
 
 ## davis-esp
 
-Software for ESP8266 or ESP32 for collecting data from Davis Vantage Pro2 weather station and
-publishing to an AWS SNS topic.
+Software for ESP8266 or ESP32 for collecting data from Davis Vantage Pro2 weather station and publishing to an MQTT queue.
 
 TODO:
 
-- include power state, battery voltage in messages
-- on failure to read data send message indicating this
 - handle missing network by queueing data to be stored. Timestamp may be unknown, indicate this somehow and use `millis()` to provide some relative time information.
 - use sd-card as non-volatile storage for queue
 - create template for aws resources
