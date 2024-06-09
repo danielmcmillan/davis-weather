@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "esp_wifi.h"
 #include "variables.h"
 #include "davis.h"
