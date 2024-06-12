@@ -4,12 +4,13 @@
 #include "davis.h"
 #include <NTPClient.h>
 #include "mqtt-client.h"
+#include "circular-stack.h"
 #include "logging.h"
 
-char body[350] = {0};
 WiFiManager wifi(WIFI_SSID, WIFI_PASSWORD);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 7200000);
+CircularStack pendingPackets;
 MqttClient mqtt(MQTT_BROKER_ENDPOINT, MQTT_BROKER_PORT, MQTT_CLIENT_ID, MQTT_BROKER_CA_CERT, MQTT_CLIENT_CERT, MQTT_CLIENT_KEY);
 
 unsigned long lastStatusCheckMillis = 0;
@@ -79,23 +80,25 @@ void loop()
     return;
   }
 
-  // TODO always write to an in-memory queue, flush to mqtt when connected
+  char *item = pendingPackets.push();
+  time_t timestamp = timeClient.getEpochTime();
   uint16_t batteryVoltage = analogRead(36); // 3322 = 4.1v
-  if (connected)
+  sprintf(item, "00%08x0000", timestamp);   // <1 byte success flag, 4 bytes timestamp, 2 bytes reserved>
+  size_t prefix_len = strlen(item);         // 14
+  size_t davis_len = 198;
+  if (davis_go(item + prefix_len))
   {
-    time_t timestamp = timeClient.getEpochTime();
-    sprintf(body, "00%08x0000", timestamp);
-    size_t prefix_len = strlen(body);
-    size_t davis_len = 0;
-    if (davis_go(body + prefix_len))
-    {
-      davis_len = 198;
-      // Update first byte to indicate success
-      body[1] = '1';
-    }
-    sprintf(body + prefix_len + davis_len, "%04x%04x", usbVoltage, batteryVoltage);
-    Serial.printf("[General] sending message %s at timestamp %d.\n", body, timestamp);
-    mqtt.publish(MQTT_TOPIC, body, prefix_len + davis_len + 4);
+    // Update first byte to indicate success
+    item[1] = '1';
+  }
+  sprintf(item + prefix_len + davis_len, "%04x%04x", usbVoltage, batteryVoltage);
+
+  // Send pending packets
+  while (connected && pendingPackets.size() > 0)
+  {
+    char *item = pendingPackets.pop();
+    Serial.printf("[General] sending message %s at timestamp %d.\n", item, timestamp);
+    connected = mqtt.publish(MQTT_TOPIC, item, prefix_len + davis_len + 8);
   }
   Serial.printf("[General] waiting...\n");
 }
