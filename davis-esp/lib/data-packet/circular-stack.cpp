@@ -5,9 +5,10 @@ CircularStack::CircularStack()
 {
 }
 
-char *CircularStack::push()
+DavisData *CircularStack::push()
 {
-    char *item = buffer + nextIndex * CIRCULAR_STACK_ITEM_SIZE;
+    int x = CIRCULAR_STACK_SIZE;
+    DavisData *item = buffer + nextIndex;
     nextIndex = (nextIndex + 1) % CIRCULAR_STACK_CAPACITY;
     if (count < CIRCULAR_STACK_CAPACITY)
     {
@@ -16,7 +17,7 @@ char *CircularStack::push()
     return item;
 }
 
-char *CircularStack::pop()
+DavisData *CircularStack::pop()
 {
     if (count == 0)
     {
@@ -31,7 +32,7 @@ char *CircularStack::pop()
         --nextIndex;
     }
     --count;
-    return buffer + nextIndex * CIRCULAR_STACK_ITEM_SIZE;
+    return buffer + nextIndex;
 }
 
 size_t CircularStack::size()

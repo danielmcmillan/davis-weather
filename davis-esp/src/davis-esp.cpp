@@ -4,21 +4,23 @@
 #include "davis.h"
 #include <NTPClient.h>
 #include "mqtt-client.h"
-#include "circular-stack.h"
 #include "logging.h"
+#include "circular-stack.h"
+#include "davis-data.h"
 
 WiFiManager wifi(WIFI_SSID, WIFI_PASSWORD);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 7200000);
 CircularStack pendingPackets;
 MqttClient mqtt(MQTT_BROKER_ENDPOINT, MQTT_BROKER_PORT, MQTT_CLIENT_ID, MQTT_BROKER_CA_CERT, MQTT_CLIENT_CERT, MQTT_CLIENT_KEY);
+char buffer[HEX_PACKET_SIZE + 1];
 
 unsigned long lastStatusCheckMillis = 0;
 unsigned long lastReadingMillis = 0;
 uint16_t usbVoltage;
 
 #define UPDATE_INTERVAL (88 * 1000)
-#define READ_INTERVAL_DISCONNECTED (15 * 60 * 1000)
+#define READ_INTERVAL_DISCONNECTED (10 * 60 * 1000)
 
 void setup()
 {
@@ -80,25 +82,22 @@ void loop()
     return;
   }
 
-  char *item = pendingPackets.push();
-  time_t timestamp = timeClient.getEpochTime();
-  uint16_t batteryVoltage = analogRead(36); // 3322 = 4.1v
-  sprintf(item, "00%08x0000", timestamp);   // <1 byte success flag, 4 bytes timestamp, 2 bytes reserved>
-  size_t prefix_len = strlen(item);         // 14
-  size_t davis_len = 198;
-  if (davis_go(item + prefix_len))
+  DavisData *item = pendingPackets.push();
+  item->timestamp = timeClient.getEpochTime();
+  item->usbVoltage = usbVoltage;
+  item->batteryVoltage = analogRead(36); // 3322 = 4.1v
+  if (!davis_go(item->davisPacket))
   {
-    // Update first byte to indicate success
-    item[1] = '1';
+    LOG_ERROR("[General] failed to read from Davis");
   }
-  sprintf(item + prefix_len + davis_len, "%04x%04x", usbVoltage, batteryVoltage);
 
   // Send pending packets
   while (connected && pendingPackets.size() > 0)
   {
-    char *item = pendingPackets.pop();
-    Serial.printf("[General] sending message %s at timestamp %d.\n", item, timestamp);
-    connected = mqtt.publish(MQTT_TOPIC, item, prefix_len + davis_len + 8);
+    DavisData *item = pendingPackets.pop();
+    createHexPacket(buffer, item);
+    Serial.printf("[General] sending message %s (timestamp %d, %d remaining)\n", buffer, item->timestamp, pendingPackets.size());
+    connected = mqtt.publish(MQTT_TOPIC, buffer, HEX_PACKET_SIZE);
   }
   Serial.printf("[General] waiting...\n");
 }

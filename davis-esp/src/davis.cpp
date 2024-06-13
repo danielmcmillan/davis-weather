@@ -13,6 +13,8 @@
 // Time between each check for data
 #define DAVIS_READ_INTERVAL 100
 
+#define DAVIS_LOOP2_SIZE 99
+
 #define ACK 0x06
 
 void davis_setup()
@@ -131,9 +133,9 @@ bool davis_loop_packet(uint8_t *loop_packet)
   DAVIS_SERIAL.write("LPS 2 1\n");
   if (davis_wait_for_data() && davis_consume_to(ack_sequence, 1))
   {
-    size_t read = davis_read(loop_packet, 99);
+    size_t read = davis_read(loop_packet, DAVIS_LOOP2_SIZE);
     Serial.printf("[DAVIS] Read %d bytes of LOOP data.\n", read);
-    return read == 99;
+    return read == DAVIS_LOOP2_SIZE;
   }
   else
   {
@@ -142,34 +144,15 @@ bool davis_loop_packet(uint8_t *loop_packet)
   }
 }
 
-// TEMP for testing
-char davis_hex_encode_nibble(uint8_t nibble)
+boolean davis_go(uint8_t *loop_packet)
 {
-  nibble &= 0xF;
-  return nibble > 9 ? nibble - 10 + 'a' : nibble + '0';
-}
-/// Encode bytes from the given array as hex characters.
-/// `length*2+1` bytes will be written at `result` with a NULL terminator byte.
-void davis_hex_encode_array(uint8_t *data, size_t length, char *result)
-{
-  for (int i = 0; i < length; ++i)
-  {
-    result[i * 2] = davis_hex_encode_nibble(data[i] >> 4);
-    result[i * 2 + 1] = davis_hex_encode_nibble(data[i]);
-  }
-  result[length * 2] = 0;
-}
-
-boolean davis_go(char *hex)
-{
-  uint8_t loop_packet[99] = {0};
   if (davis_wake() && davis_loop_packet(loop_packet))
   {
-    davis_hex_encode_array(loop_packet, 99, hex);
     return true;
   }
   else
   {
+    memset(loop_packet, 0, DAVIS_LOOP2_SIZE);
     return false;
   }
 }
