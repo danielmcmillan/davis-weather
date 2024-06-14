@@ -4,6 +4,15 @@
 
 Software for ESP8266 or ESP32 for collecting data from Davis Vantage Pro2 weather station and publishing to an MQTT queue.
 
+The MQTT message contains the hex encoding of:
+
+- 1 byte flag: 1 if reading from Davis device was successfully.
+- 4 byte timestamp: Unix Epoch timestamp in seconds (unsigned, big-endian)
+- 2 byte reserved
+- 99 byte Davis LOOP2 packet data
+- 2 byte input voltage reading (unsigned, big-endian)
+- 2 byte battery voltage reading (unsigned, big-endian)
+
 TODO:
 
 - use sd-card as non-volatile storage to queue data when network is unavailable
