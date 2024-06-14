@@ -6,8 +6,8 @@ Software for ESP8266 or ESP32 for collecting data from Davis Vantage Pro2 weathe
 
 TODO:
 
-- handle missing network by queueing data to be stored. Timestamp may be unknown, indicate this somehow and use `millis()` to provide some relative time information.
-- use sd-card as non-volatile storage for queue
+- use sd-card as non-volatile storage to queue data when network is unavailable
+- handle missing timestamp, indicate this somehow and use `millis()` to provide some relative time information.
 - create template for aws resources
 - collect additional data, other than LOOP2 packet
 
