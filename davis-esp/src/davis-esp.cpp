@@ -36,7 +36,7 @@ void setup()
 void loop()
 {
   unsigned long now = millis();
-  bool doStatusChecks = now - lastStatusCheckMillis >= UPDATE_INTERVAL;
+  bool doStatusChecks = lastStatusCheckMillis == 0 || now - lastStatusCheckMillis >= UPDATE_INTERVAL;
 
   if (doStatusChecks)
   {
@@ -62,13 +62,13 @@ void loop()
   else if (doStatusChecks)
   {
     // TODO low power sleep when not charging
-    LOG_INFO("[General] disconnecting WiFi since power is disconnected");
+    LOG_INFO("[General] disconnecting WiFi since power is disconnected: %d", usbVoltage);
     mqtt.loop(false);
     wifi.loop(false);
     connected = false;
   }
 
-  if ((doStatusChecks && connected) || now - lastReadingMillis >= READ_INTERVAL_DISCONNECTED)
+  if ((doStatusChecks && connected) || lastReadingMillis == 0 || now - lastReadingMillis >= READ_INTERVAL_DISCONNECTED)
   {
     lastReadingMillis = now;
     if (!timeClient.isTimeSet())
